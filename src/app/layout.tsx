@@ -21,12 +21,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body
-        className={`${notoSansJp.variable} antialiased bg-slate-950 text-slate-50`}
-      >
-        <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#1d2538,_#020617)]">
-          {children}
-        </div>
+      <body className={`${notoSansJp.variable} antialiased`}>
+        {children}
       </body>
     </html>
   );
