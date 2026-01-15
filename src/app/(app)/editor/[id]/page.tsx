@@ -274,74 +274,208 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     // =================================================================
     if (isNew) {
         return (
-            <div className="p-8 max-w-4xl mx-auto space-y-8">
-                <h1 className="text-3xl font-bold text-gray-900">新しいプロジェクトを作成</h1>
+            <div className="p-6 md:p-10 lg:p-12 max-w-6xl mx-auto">
+                <div className="mb-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-300 mb-2">
+                            CLIPTEN AI STUDIO
+                        </p>
+                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-50 tracking-tight">
+                            新しいプロジェクトを作成
+                        </h1>
+                        <p className="mt-2 text-sm md:text-base text-slate-300 max-w-xl">
+                            長尺の配信アーカイブをアップロードすると、AI が見どころを解析し、
+                            ショート動画向けのクリップ案を自動で生成します。
+                        </p>
+                    </div>
+                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-slate-900/60 border border-slate-700/80 backdrop-blur">
+                        <Icons.Brain />
+                        <span className="text-xs font-semibold text-slate-200">
+                            Gemini + FFmpeg で全自動切り抜き
+                        </span>
+                    </div>
+                </div>
 
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 space-y-8">
-                    <div className="space-y-4">
-                        <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                            <span className="bg-indigo-600 w-1 h-4 rounded-full"></span>
-                            動画のジャンル
-                        </label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {GENRES.map((g) => (
-                                <button
-                                    key={g.id}
-                                    onClick={() => setGenre(g.id)}
-                                    className={`p-4 rounded-xl text-left transition-all border ${genre === g.id
-                                            ? 'bg-indigo-50 border-indigo-600 ring-1 ring-indigo-600 shadow-sm'
-                                            : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                        }`}
-                                >
-                                    <div className={`font-bold text-lg mb-1 ${genre === g.id ? 'text-indigo-900' : 'text-gray-800'}`}>
-                                        {g.name}
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 items-start">
+                    {/* 左：設定エリア */}
+                    <div className="space-y-6">
+                        <div className="rounded-3xl border border-slate-700/80 bg-slate-900/70 backdrop-blur shadow-[0_18px_60px_rgba(15,23,42,0.85)] p-6 md:p-8 space-y-8">
+                            {/* ステップガイド */}
+                            <ol className="flex flex-col md:flex-row gap-4 md:gap-6 text-xs">
+                                {[
+                                    { label: 'ジャンルを選択', active: true },
+                                    { label: '動画をアップロード', active: !!file },
+                                    { label: 'AI解析を開始', active: false },
+                                ].map((step, i) => (
+                                    <li key={i} className="flex items-center gap-3">
+                                        <div
+                                            className={`flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-bold
+                                            ${step.active
+                                                    ? 'border-indigo-400 bg-indigo-500/20 text-indigo-100'
+                                                    : 'border-slate-700 bg-slate-900 text-slate-400'
+                                                }`}
+                                        >
+                                            {i + 1}
+                                        </div>
+                                        <span className="text-slate-300">{step.label}</span>
+                                    </li>
+                                ))}
+                            </ol>
+
+                            {/* ジャンル選択 */}
+                            <div className="space-y-3">
+                                <label className="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                                    <span className="inline-block h-4 w-1 rounded-full bg-gradient-to-b from-indigo-400 to-purple-400" />
+                                    動画のジャンル
+                                    <span className="rounded-full border border-indigo-500/40 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-semibold text-indigo-200">
+                                        AIの解析精度に影響します
+                                    </span>
+                                </label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {GENRES.map((g) => {
+                                        const selected = genre === g.id;
+                                        return (
+                                            <button
+                                                key={g.id}
+                                                type="button"
+                                                onClick={() => setGenre(g.id)}
+                                                className={`group relative overflow-hidden rounded-2xl border px-4 py-3.5 text-left transition-all
+                                                ${selected
+                                                        ? 'border-indigo-400 bg-gradient-to-br from-indigo-600/70 via-indigo-500/60 to-purple-500/60 shadow-[0_18px_45px_rgba(79,70,229,0.7)]'
+                                                        : 'border-slate-700/80 bg-slate-900/70 hover:border-indigo-500/60 hover:bg-slate-900'
+                                                    }`}
+                                            >
+                                                <div
+                                                    className={`text-xs font-semibold mb-1 flex items-center gap-1.5 ${selected ? 'text-indigo-50' : 'text-slate-300'
+                                                        }`}
+                                                >
+                                                    <span>{g.name}</span>
+                                                </div>
+                                                <p
+                                                    className={`text-[11px] leading-relaxed ${selected ? 'text-indigo-100/90' : 'text-slate-400'
+                                                        }`}
+                                                >
+                                                    {g.desc}
+                                                </p>
+
+                                                {selected && (
+                                                    <div className="pointer-events-none absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_top,_rgba(248,250,252,0.35),_transparent_60%)]" />
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* ファイルアップロード */}
+                            <div className="space-y-3">
+                                <label className="text-xs font-semibold text-slate-200 flex items-center gap-2">
+                                    <span className="inline-block h-4 w-1 rounded-full bg-gradient-to-b from-sky-400 to-indigo-400" />
+                                    動画ファイル（mp4 / mov など）
+                                </label>
+
+                                <div className="relative group">
+                                    <input
+                                        type="file"
+                                        accept="video/*"
+                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                        className="absolute inset-0 z-20 h-full w-full cursor-pointer opacity-0"
+                                    />
+                                    <div
+                                        className={`relative flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-all
+                                        ${file
+                                                ? 'border-emerald-400/80 bg-gradient-to-br from-emerald-600/40 via-emerald-500/20 to-slate-900/60 shadow-[0_20px_60px_rgba(16,185,129,0.5)]'
+                                                : 'border-slate-600/80 bg-slate-900/60 hover:border-indigo-400 hover:bg-slate-900/80'
+                                            }`}
+                                    >
+                                        <div
+                                            className={`flex h-14 w-14 items-center justify-center rounded-full border text-indigo-200 shadow-lg
+                                            ${file
+                                                    ? 'border-emerald-300/80 bg-emerald-500/30'
+                                                    : 'border-indigo-400/70 bg-indigo-500/30'
+                                                }`}
+                                        >
+                                            <Icons.Upload />
+                                        </div>
+
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-50">
+                                                {file ? file.name : 'ここにドラッグ＆ドロップ、またはクリックして選択'}
+                                            </p>
+                                            <p className="mt-1 text-[11px] text-slate-400">
+                                                {file
+                                                    ? `${(file.size / 1024 / 1024).toFixed(1)} MB / 推奨: 2時間以内の動画`
+                                                    : '長時間の配信でもOK。アップロード中もこのタブを閉じずにお待ちください。'}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className={`text-xs ${genre === g.id ? 'text-indigo-700' : 'text-gray-500'}`}>
-                                        {g.desc}
-                                    </div>
-                                </button>
-                            ))}
+                                </div>
+                            </div>
                         </div>
+
+                        <button
+                            onClick={handleUpload}
+                            disabled={!file || uploading}
+                            className={`w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold tracking-wide transition-all
+                            ${!file || uploading
+                                    ? 'cursor-not-allowed bg-slate-700/60 text-slate-400'
+                                    : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-[0_16px_45px_rgba(236,72,153,0.7)] hover:shadow-[0_20px_60px_rgba(236,72,153,0.85)] hover:translate-y-[-1px] active:translate-y-[0.5px]'
+                                }`}
+                        >
+                            {uploading ? (
+                                <>
+                                    <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/60 border-t-transparent" />
+                                    アップロード中...
+                                </>
+                            ) : (
+                                <>
+                                    <Icons.Brain />
+                                    解析を開始する
+                                </>
+                            )}
+                        </button>
                     </div>
 
-                    <div className="space-y-4">
-                        <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                            <span className="bg-indigo-600 w-1 h-4 rounded-full"></span>
-                            動画ファイル (mp4)
-                        </label>
-                        <div className="relative group">
-                            <input
-                                type="file"
-                                accept="video/*"
-                                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                            />
-                            <div className={`p-10 rounded-xl border-2 border-dashed transition-all flex flex-col items-center justify-center gap-3
-                  ${file
-                                    ? 'border-indigo-500 bg-indigo-50'
-                                    : 'border-gray-300 bg-gray-50 group-hover:bg-gray-100 group-hover:border-gray-400'
-                                }`}>
-                                <div className={`p-3 rounded-full transition-colors ${file ? 'text-indigo-600 bg-white shadow-sm' : 'text-gray-400 bg-gray-200'}`}>
-                                    <Icons.Upload />
+                    {/* 右：ビジュアルプレビュー */}
+                    <div className="hidden lg:flex items-center justify-center">
+                        <div className="relative w-full max-w-[320px]">
+                            <div className="absolute -inset-1 rounded-[2.2rem] bg-gradient-to-br from-indigo-500/70 via-purple-500/70 to-emerald-400/70 blur-2xl opacity-70" />
+                            <div className="relative aspect-[9/16] w-full rounded-[2rem] border border-slate-600/80 bg-slate-900/90 shadow-[0_30px_80px_rgba(15,23,42,0.9)] overflow-hidden flex flex-col">
+                                <div className="h-9 flex items-center justify-between px-4 border-b border-slate-700/80 bg-slate-900/80">
+                                    <div className="flex gap-1.5">
+                                        <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
+                                        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+                                        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+                                    </div>
+                                    <span className="text-[10px] font-semibold text-slate-400">
+                                        Preview
+                                    </span>
                                 </div>
-                                <div className="text-center">
-                                    <p className="font-bold text-gray-700">{file ? file.name : 'ファイルを選択'}</p>
-                                    <p className="text-sm text-gray-500">{file ? `${(file.size / 1024 / 1024).toFixed(1)} MB` : 'ドラッグ＆ドロップ または クリック'}</p>
+                                <div className="flex-1 relative flex items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.45),_transparent_55%),radial-gradient(circle_at_bottom,_rgba(52,211,153,0.4),_transparent_55%)]">
+                                    <div className="absolute inset-x-6 top-8 space-y-2 text-center">
+                                        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-200/80">
+                                            AI EDIT HIGHLIGHT
+                                        </p>
+                                        <p className="text-sm font-bold text-slate-50 leading-snug">
+                                            {file
+                                                ? 'アップロードされた動画からベストなハイライトを生成します'
+                                                : 'まだ動画が選択されていません'}
+                                        </p>
+                                    </div>
+                                    <div className="absolute inset-x-4 bottom-8 flex flex-col gap-2">
+                                        <div className="h-1.5 rounded-full bg-slate-800/80 overflow-hidden">
+                                            <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-emerald-400 via-sky-400 to-indigo-500" />
+                                        </div>
+                                        <div className="flex justify-between text-[9px] text-slate-300/80 font-mono">
+                                            <span>00:00:00</span>
+                                            <span>AI Cut</span>
+                                            <span>00:59:59</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <button
-                        onClick={handleUpload}
-                        disabled={!file || uploading}
-                        className={`w-full py-4 rounded-xl font-bold text-lg shadow-sm transition-all flex items-center justify-center gap-2 ${!file || uploading
-                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
-                            }`}
-                    >
-                        {uploading ? 'アップロード中...' : '解析を開始する'}
-                    </button>
                 </div>
             </div>
         );
