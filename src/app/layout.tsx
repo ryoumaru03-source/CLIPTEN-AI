@@ -4,7 +4,8 @@ import "./globals.css";
 
 const notoSansJp = Noto_Sans_JP({
   variable: "--font-sans-jp",
-  subsets: ["latin", "latin-ext", "japanese"],
+  // Noto_Sans_JP は Next.js の型的には latin のみが有効なサブセット
+  subsets: ["latin"],
   display: "swap",
 });
 
