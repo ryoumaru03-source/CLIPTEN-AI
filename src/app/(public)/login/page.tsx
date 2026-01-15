@@ -8,14 +8,10 @@ export default function LoginPage() {
 
     const handleLogin = async () => {
         setLoading(true);
-        // Googleログインを開始
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                // ログイン後はダッシュボードへ飛ばす
-                redirectTo: `${location.origin}/dashboard`,
-            }, // ★ここの閉じカッコが抜けていました
-        });
+      // Googleログインを開始（まずは最小構成でリダイレクトさせる）
+      const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+      });
 
         if (error) {
             alert('ログインに失敗しました: ' + error.message);
