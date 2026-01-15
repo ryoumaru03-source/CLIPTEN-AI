@@ -8,9 +8,13 @@ export default function LoginPage() {
 
     const handleLogin = async () => {
         setLoading(true);
-      // Googleログインを開始（まずは最小構成でリダイレクトさせる）
+      // Googleログインを開始
       const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
+          options: {
+              // ログイン後はダッシュボードへ
+              redirectTo: `${location.origin}/dashboard`,
+          },
       });
 
         if (error) {
